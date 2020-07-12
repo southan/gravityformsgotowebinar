@@ -195,6 +195,10 @@ class GFGoToWebinar extends GFFeedAddOn {
 
 			$api = $this->api();
 
+			if ( $api->token_expires <= time() ) {
+				$this->refresh_access_token();
+			}
+
 			$response = $api->post(
 				"organizers/$api->organizer_key/webinars/$webinar_id/registrants?resendConfirmation=true",
 				$values,
