@@ -183,15 +183,23 @@ class GFGoToWebinar extends GFFeedAddOn {
 				throw new Exception( __( 'Webinar ID required.', 'gravityformsgotowebinar' ) );
 			}
 
-			$values = [];
+			$fields = [];
 
 			$field_map = $this->get_field_map_fields( $feed, 'fieldMap' );
 
 			$field_map = array_filter( $field_map );
 
 			foreach ( $field_map as $name => $field_id ) {
-				$values[ $name ] = $this->get_field_value( $form, $entry, $field_id );
+				$fields[ $name ] = $this->get_field_value( $form, $entry, $field_id );
 			}
+
+			/**
+			 * Filter the registration API payload data.
+			 *
+			 * @param array $fields
+			 * @param array $form
+			 */
+			$fields = apply_filters( 'gravityformsgotowebinar_registration_fields', $fields, $form );
 
 			$api = $this->api();
 
@@ -201,7 +209,7 @@ class GFGoToWebinar extends GFFeedAddOn {
 
 			$response = $api->post(
 				"organizers/$api->organizer_key/webinars/$webinar_id/registrants?resendConfirmation=true",
-				$values,
+				$fields,
 				[
 					'headers' => [
 						'Accept' => 'application/vnd.citrix.g2wapi-v1.1+json',
